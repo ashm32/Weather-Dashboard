@@ -7,6 +7,7 @@ function initPage() {
     const currentTempEl = document.getElementById("temperature");
     const currentHumidityEl = document.getElementById("humidity");
     const currentWindEl = document.getElementById("wind-speed");
+    const currentUVEl = document.getElementById("UV-index");
     const historyEl = document.getElementById("history");
     var fivedayEl = document.getElementById("fiveday-header");
     var todayweatherEl = document.getElementById("today-weather");
@@ -14,12 +15,15 @@ function initPage() {
 
     // Assigning a unique API to a variable
     const APIKey = "84b79da5e5d7c92085660485702f4ce8";
-  function getWeather(cityName) {
+
+    function getWeather(cityName) {
         // Execute a current weather get request from open weather api
         let queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + APIKey;
         axios.get(queryURL)
             .then(function (response) {
+
                 todayweatherEl.classList.remove("d-none");
+
                 // Parse response to display current weather
                 const currentDate = new Date(response.data.dt * 1000);
                 const day = currentDate.getDate();
@@ -33,7 +37,7 @@ function initPage() {
                 currentHumidityEl.innerHTML = "Humidity: " + response.data.main.humidity + "%";
                 currentWindEl.innerHTML = "Wind Speed: " + response.data.wind.speed + " MPH";
                 
-                // Get 5 day forecast for the city inputted
+                // Get 5 day forecast for this city
                 let cityID = response.data.id;
                 let forecastQueryURL = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + APIKey;
                 axios.get(forecastQueryURL)
@@ -68,7 +72,9 @@ function initPage() {
                         }
                     })
             });
-     // if there is any previous searches, get history from local storage 
+    }
+
+    // Get history from local storage if any
     searchEl.addEventListener("click", function () {
         const searchTerm = cityEl.value;
         getWeather(searchTerm);
@@ -83,10 +89,11 @@ function initPage() {
         searchHistory = [];
         renderSearchHistory();
     })
-  }
+
     function k2f(K) {
         return Math.floor((K - 273.15) * 1.8 + 32);
     }
+
     function renderSearchHistory() {
         historyEl.innerHTML = "";
         for (let i = 0; i < searchHistory.length; i++) {
@@ -101,6 +108,7 @@ function initPage() {
             historyEl.append(historyItem);
         }
     }
+
     renderSearchHistory();
     if (searchHistory.length > 0) {
         getWeather(searchHistory[searchHistory.length - 1]);
